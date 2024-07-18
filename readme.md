@@ -7,7 +7,7 @@ The communication between the sender (EMR User Input) and the receiver (ICD-10 P
 ## Prerequisites
 
 1. **RabbitMQ** : Install RabbitMQ. You can download it from [RabbitMQ official website]().
-2. **Python Libraries** : Install the required Python libraries using the following command: pip install pika requests
+2. **Python Libraries** : Install the required Python libraries using the following command: ```pip install pika requests```
 
 ## Communication Contract
 
