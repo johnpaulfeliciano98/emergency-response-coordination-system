@@ -1,4 +1,4 @@
-# EMR User Input and ICD-10 Processor Microservices
+# Automated ICD-10 Coding for EMR Data
 
 This project implements two microservices designed to streamline patient data processing:
 
