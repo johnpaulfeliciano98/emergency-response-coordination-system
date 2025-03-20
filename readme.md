@@ -1,57 +1,115 @@
 # EMR User Input and ICD-10 Processor Microservices
 
-This microservice allows users to submit patient information, including chief complaints, to receive corresponding ICD-10 codes.
+This project implements two microservices designed to streamline patient data processing:
 
-The communication between the sender (EMR User Input) and the receiver (ICD-10 Processor) is established using RabbitMQ.
+- **EMR User Input Microservice:** Collects patient details (including chief complaints) and sends the data via RabbitMQ.
+- **ICD-10 Processor Microservice:** Consumes messages from RabbitMQ, processes the chief complaint, and outputs the corresponding ICD-10 code.
+
+The services communicate asynchronously using RabbitMQ, ensuring reliable and decoupled integration.
 
 ## Prerequisites
 
-1. **RabbitMQ** : Install RabbitMQ. You can download it from [RabbitMQ official website]().
-2. **Python Libraries** : Install the required Python libraries using the following command: ```pip install pika requests```
+Before running the microservices, make sure you have the following installed:
+
+- **RabbitMQ:**  
+  Download and install RabbitMQ from the [official website](https://www.rabbitmq.com/).
+
+- **Python Libraries:**  
+  Install the required Python packages using pip:
+  ```bash
+  pip install pika requests
+  ```
 
 ## Communication Contract
 
-### Sending Data (EMR User Input)
+### 1. Sending Data from EMR User Input
 
-#### Request
+- **Queue Name:** `chief_complaints_queue`
+- **Payload Format:** JSON object containing patient information.
 
-* Endpoint: RabbitMQ Queue - `chief_complaints_queue`
-* Payload: JSON object containing user information
+**Example Payload:**
 
-  {
-  "name":"John Doe",
-  "dob":"1990-01-01",
-  "age":32,
-  "gender":"M",
-  "chief_complaints":"Chest pain",
-  "vitals":{
-  "hr":75,
-  "bp":"120/80",
-  "rr":18,
-  "o2_saturation":98,
-  "temperature":98.6
-  },
-  "eta":15,
-  "los":"ALS"
-  }
+```json
+{
+    "name": "John Doe",
+    "dob": "1990-01-01",
+    "age": 32,
+    "gender": "M",
+    "chief_complaints": "Chest pain",
+    "vitals": {
+        "hr": 75,
+        "bp": "120/80",
+        "rr": 18,
+        "o2_saturation": 98,
+        "temperature": 98.6
+    },
+    "eta": 15,
+    "los": "ALS"
+}
+```
 
-### Receiving Data (ICD-10 Microservice)
+### 2. Receiving Data in ICD-10 Processor
 
-#### Response
+Upon receiving a message, the ICD-10 Processor microservice will:
 
-* The ICD-10 microservice will print the received chief complaint and its corresponding ICD-10 code.
+- Parse the chief complaint.
+- Determine the corresponding ICD-10 code.
+- Print both the chief complaint and the ICD-10 code to the console.
 
-  [x]Received Chief Complaint: Chest pain
-  [x]Corresponding ICD-10 Code: I20.9
+**Example Output:**
 
-## Example Call
+```plaintext
+[x] Received Chief Complaint: Chest pain
+[x] Corresponding ICD-10 Code: I20.9
+```
 
-1. **Send Patient Information from EMR User Input**
-   * Run `emr-user-input.py`
-   * Enter patient information as prompted.
-   * After entering all details, choose option `0` to submit.
-   * The patient information, including chief complaint, will be sent to the microservice via RabbitMQ.
-2. **Receive and Process in ICD-10 Processor**
-   * Run `receive.py`
-   * The microservice will consume messages from the RabbitMQ queue.
-   * It will print the received chief complaint and its corresponding ICD-10 code.
+## Running the Microservices
+
+### EMR User Input Microservice
+
+- **File:** `emr-user-input.py`
+
+**Instructions:**
+
+1. Run the script:
+
+    ```bash
+    python emr-user-input.py
+    ```
+
+2. Follow the prompts to enter patient information.
+3. When finished, choose option `0` to submit. The patient information is then sent to RabbitMQ.
+
+### ICD-10 Processor Microservice
+
+- **File:** `receive.py`
+
+**Instructions:**
+
+1. Run the script:
+
+    ```bash
+    python receive.py
+    ```
+
+2. The microservice will listen to the `chief_complaints_queue`, process incoming messages, and display the results.
+
+## Additional Information
+
+### Message Flow
+
+- The EMR User Input service acts as the **producer** (sending patient data), while the ICD-10 Processor service acts as the **consumer** (receiving and processing the data).
+
+### Customization
+
+- Both microservices can be extended or integrated with additional services as needed.
+
+## Troubleshooting
+
+### RabbitMQ Connection
+
+- Ensure that RabbitMQ is running on `localhost` and the queue `chief_complaints_queue` is properly declared.
+
+### Input Validation
+
+- The `emr-user-input.py` script includes input validation. If you encounter errors, follow the on-screen prompts to correct the input format.
